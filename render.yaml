@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: chat-backend
+    runtime: node
+    buildCommand: npm install && ./node_modules/.bin/prisma generate && ./node_modules/.bin/prisma migrate deploy
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chat-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        value: "*"
+
+databases:
+  - name: chat-db
+    databaseName: chatapp_0dk6
+    user: chatapp_0dk6_user
+    plan: free
