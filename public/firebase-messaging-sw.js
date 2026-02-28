@@ -1,6 +1,6 @@
 // web/firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyBEjIVNc9fp7UrvTzodN7hzOR1dVKx0JZA",
@@ -11,9 +11,15 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
+
 messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/icons/Icon-192.png'
+  console.log('[SW] Background message:', payload);
+  const { title, body } = payload.notification;
+  self.registration.showNotification(title, {
+    body,
+    icon: '/icons/Icon-192.png',
+    badge: '/icons/Icon-192.png',
+    tag: 'chat-message',         // replaces previous notification of same tag
+    renotify: true,
   });
 });
