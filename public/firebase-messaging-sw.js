@@ -4,9 +4,9 @@ importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging-comp
 
 firebase.initializeApp({
   apiKey: "AIzaSyBEjIVNc9fp7UrvTzodN7hzOR1dVKx0JZA",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  authDomain: "cserve-4fdaa.firebaseapp.com",
   projectId: "cserve-4fdaa",
-  messagingSenderId: "YOUR_SENDER_ID",
+  messagingSenderId: "379854362881",
   appId: "1:379854362881:web:b95d154780c0f2ee162300"
 });
 
