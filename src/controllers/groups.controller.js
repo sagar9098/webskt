@@ -153,4 +153,78 @@ async function leaveGroup(req, res) {
   }
 }
 
-module.exports = { getMyGroups, getAllGroups, getGroupById, createGroup, joinGroup, leaveGroup };
+
+
+/**
+ * POST /groups/:id/add-member
+ * Body: { userId }
+ * Only the group creator can add members.
+ */
+async function addMember(req, res) {
+  try {
+    const { id: groupId } = req.params;
+    const { userId }      = req.body;
+
+    if (!userId) return res.status(400).json({ message: 'userId is required.' });
+
+    // Only creator can add members
+    const group = await prisma.group.findUnique({ where: { id: groupId } });
+    if (!group) return res.status(404).json({ message: 'Group not found.' });
+    if (group.createdById !== req.user.id) {
+      return res.status(403).json({ message: 'Only the group creator can add members.' });
+    }
+
+    // Check user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    await prisma.groupMember.upsert({
+      where:  { userId_groupId: { userId, groupId } },
+      update: {},
+      create: { userId, groupId },
+    });
+
+    const updated = await prisma.group.findUnique({
+      where:  { id: groupId },
+      select: groupWithMembers,
+    });
+
+    return res.json(formatGroup(updated));
+  } catch (err) {
+    console.error('[Groups] addMember error:', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+}
+
+/**
+ * DELETE /groups/:id/remove-member/:userId
+ * Only the group creator can remove members (cannot remove self via this endpoint).
+ */
+async function removeMember(req, res) {
+  try {
+    const { id: groupId, userId } = req.params;
+
+    const group = await prisma.group.findUnique({ where: { id: groupId } });
+    if (!group) return res.status(404).json({ message: 'Group not found.' });
+    if (group.createdById !== req.user.id) {
+      return res.status(403).json({ message: 'Only the group creator can remove members.' });
+    }
+    if (userId === req.user.id) {
+      return res.status(400).json({ message: 'Creator cannot remove themselves. Use leave instead.' });
+    }
+
+    await prisma.groupMember.deleteMany({ where: { userId, groupId } });
+
+    const updated = await prisma.group.findUnique({
+      where:  { id: groupId },
+      select: groupWithMembers,
+    });
+
+    return res.json(formatGroup(updated));
+  } catch (err) {
+    console.error('[Groups] removeMember error:', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+}
+
+module.exports = { getMyGroups, getAllGroups, getGroupById, createGroup, joinGroup, leaveGroup, addMember, removeMember };

@@ -12,6 +12,7 @@ const authRoutes     = require('./routes/auth.routes');
 const usersRoutes    = require('./routes/users.routes');
 const groupsRoutes   = require('./routes/groups.routes');
 const messagesRoutes = require('./routes/messages.routes');
+const giphyRoutes = require('./routes/giphy.routes');
 const { initSocket }   = require('./services/socket');
 const { initFirebase } = require('./services/firebase');
 const prisma           = require('./services/prisma');
@@ -43,6 +44,7 @@ app.use('/auth',     authRoutes);
 app.use('/users',    usersRoutes);
 app.use('/groups',   groupsRoutes);
 app.use('/messages', messagesRoutes);
+app.use('/giphy', giphyRoutes);
 
 // Health check
 app.get('/health', (_req, res) =>

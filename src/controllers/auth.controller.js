@@ -14,6 +14,7 @@ const { signToken } = require('../services/jwt');
  *   - Username found + password matches → return token
  *   - Username found + password wrong → 401
  */
+
 async function login(req, res) {
   try {
     const { username, password } = req.body;
@@ -47,8 +48,8 @@ async function login(req, res) {
     return res.json({
       token,
       user: {
-        id:        user.id,
-        username:  user.username,
+        id: user.id,
+        username: user.username,
         createdAt: user.createdAt,
       },
     });
